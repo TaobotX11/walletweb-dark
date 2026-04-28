@@ -134,7 +134,7 @@ The backend is a lightweight API proxy that connects to a Nusacoin full node. It
 | `RPC_USER` | `nux_rpc` | RPC username |
 | `RPC_PASS` | — | RPC password (required) |
 | `CORS_ORIGIN` | `https://dompet.nusacoin.org` | Allowed CORS origin |
-| `EXPLORER_URL` | `http://127.0.0.1:8332` | eIquidus explorer URL |
+| `EXPLORER_URL` | `http://127.0.0.1:8332` | explorer URL |
 
 ## License
 
@@ -142,7 +142,8 @@ MIT
 
 ## Links
 
-- **Website:** [nusacoin.com](https://nusacoin.com)
-- **Explorer:** [explorer.nusacoin.com](https://explorer.nusacoin.com)
+- **Website:** [nusacoin.org](https://nusacoin.org)
+- **Explorer:** [explorer.nusacoin.org](https://explorer.nusacoin.org)
+- **Explorer 2:** [explorer.taobot.org](https://explorer.taobot.org)
 - **Wallet:** [dompet.nusacoin.org](https://dompet.nusacoin.org)
-- **GitHub:** [github.com/TaobotX11](https://github.com/TaobotX11)
+- **GitHub:** [github.com/TaobotX11/walletweb-dark](https://github.com/TaobotX11/walletweb-dark)
