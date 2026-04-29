@@ -42,7 +42,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
       });
 
       const result = await broadcastTx(tx.hex);
-      setTxResult({ txid: result.txid, fee: tx.fee });
+      setTxResult({ txid: result.result, fee: tx.fee });
       setStep('success');
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Transaction failed';

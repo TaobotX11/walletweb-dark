@@ -34,18 +34,17 @@ export interface ExplorerRawHex {
 }
 
 export async function getRawHex(txid: string): Promise<{
-  hex: string
+  hex: string,
+  error: string
 }> {
 
   try {
-    const rawHex = await explorerFetch<ExplorerRawHex | { error: string }>(`/api/getrawtransaction/${txid}&decrypt=1`);
-    if ('error' in rawHex) {
-      return { hex: 'error' };
-    }
+    const rawHex = await explorerFetch<ExplorerRawHex>(`/api/getrawtransaction?txid=${txid}&decrypt=1`);
 
-    return { hex: rawHex.hex };
+
+    return { hex: rawHex.hex, error: '' };
   } catch (error) {
-    return { hex: 'check console ' + error };
+    return { hex: '', error: '' + error };
   }
 }
 

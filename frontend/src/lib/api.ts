@@ -33,7 +33,6 @@ async function apiFetchUtxo<T>(path: string, options?: RequestInit): Promise<T> 
   if (!res.ok) {
     throw new Error(data.error || `API error ${res.status}`);
   }
-  console.log(data.result.unspents);
   return data.result.unspents as T;
 }
 
@@ -41,6 +40,12 @@ export interface BalanceResponse {
   balance: number;   // in nusan
   received: number;  // in nusan
   sent: number;      // in nusan
+}
+
+export interface BroadcastResponse {
+  result: string,
+  error: unknown,
+  id: string
 }
 
 export async function fetchBalance(address: string): Promise<BalanceResponse> {
@@ -70,10 +75,12 @@ export async function fetchHistory(address: string): Promise<HistoryTx[]> {
   return apiFetch<HistoryTx[]>(`/history/${address}`);
 }
 
-export async function broadcastTx(hex: string): Promise<{ txid: string }> {
-  return apiFetch<{ txid: string }>('/broadcast', {
+export async function broadcastTx(hex: string): Promise<BroadcastResponse> {
+  const params = new URLSearchParams();
+  params.append('raw', hex);
+  return apiFetchUtxo<BroadcastResponse>('/broadcast', {
     method: 'POST',
-    body: JSON.stringify({ hex }),
+    body: params,
   });
 }
 

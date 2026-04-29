@@ -163,7 +163,7 @@ router.get('/rawtx/:txid', async (req: Request<{ txid: string }>, res: Response)
   }
   try {
     const hex = await getRawHex(txid);
-    res.json({ hex });
+    res.json(hex);
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     res.status(500).json({ error: message });
