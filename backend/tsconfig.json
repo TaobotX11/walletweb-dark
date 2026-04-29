@@ -8,8 +8,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "types": [
-      "node",
-      "vite/client"
+      "node"
     ],
     "strict": true,
     "esModuleInterop": true,

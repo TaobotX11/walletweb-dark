@@ -1,4 +1,4 @@
-import { API_BASE, COIN } from './network';
+import { APINUSA_URL, API_BASE, COIN } from './network';
 import type { UTXO, ExplorerUTXO } from './transaction';
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
@@ -19,6 +19,24 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return data as T;
 }
 
+async function apiFetchUtxo<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${APINUSA_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || `API error ${res.status}`);
+  }
+  console.log(data.result.unspents);
+  return data.result.unspents as T;
+}
+
 export interface BalanceResponse {
   balance: number;   // in nusan
   received: number;  // in nusan
@@ -30,7 +48,7 @@ export async function fetchBalance(address: string): Promise<BalanceResponse> {
 }
 
 export async function fetchUtxos(address: string): Promise<UTXO[]> {
-  const raw = await apiFetch<ExplorerUTXO[]>(`/utxos/${address}`);
+  const raw = await apiFetchUtxo<ExplorerUTXO[]>(`/utxos/${address}`);
   // Normalize explorer UTXOs to internal format
   return raw.map((u) => ({
     txid: u.txid,

@@ -15,8 +15,9 @@ export default defineConfig({
     global: 'globalThis',
   },
   server: {
+    allowedHosts: ['dompet.nusacoin.org', '.nusacoin.org'],
     proxy: {
-      '/api': 'http://localhost:3001',
+      '/api': 'https://explorer.nusacoin.org',
     },
   },
   build: {

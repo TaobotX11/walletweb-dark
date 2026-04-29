@@ -1,5 +1,5 @@
 // Client for the eIquidus explorer API (runs locally on the VPS)
-const EXPLORER_URL = process.env.EXPLORER_URL || 'http://127.0.0.1:8332';
+const EXPLORER_URL = 'https://explorer.nusacoin.org';
 
 async function explorerFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${EXPLORER_URL}${path}`);
@@ -27,6 +27,26 @@ export interface ExplorerUtxo {
   amount: number;
   scriptPubKey: string;
   height: number;
+}
+
+export interface ExplorerRawHex {
+  hex: string;
+}
+
+export async function getRawHex(txid: string): Promise<{
+  hex: string
+}> {
+
+  try {
+    const rawHex = await explorerFetch<ExplorerRawHex | { error: string }>(`/api/getrawtransaction/${txid}&decrypt=1`);
+    if ('error' in rawHex) {
+      return { hex: 'error' };
+    }
+
+    return { hex: rawHex.hex };
+  } catch (error) {
+    return { hex: 'check console ' + error };
+  }
 }
 
 // Get balance for address (returns balance in coins, we convert to nusan)

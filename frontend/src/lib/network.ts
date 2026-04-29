@@ -28,3 +28,4 @@ export const MIN_FEE_RATE = 1;
 export const DEFAULT_FEE_RATE = 10;
 
 export const API_BASE = '/api';
+export const APINUSA_URL = 'https://apinusa.taobot.org';

@@ -7,7 +7,7 @@ import routes from './routes';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
-const ALLOWED_ORIGIN = process.env.CORS_ORIGIN || 'https://wallet.nusacoin.com';
+const ALLOWED_ORIGIN = '*';
 
 // Security headers
 app.use(helmet());

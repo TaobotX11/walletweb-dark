@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { rpcCall } from './rpc';
-import { getBalance, getAddressTxs, ExplorerAddress } from './explorer';
+import { getRawHex, getBalance, getAddressTxs, ExplorerAddress } from './explorer';
 
 // Build UTXOs by: explorer last_txs → getrawtransaction → gettxout
 async function buildUtxos(address: string): Promise<Array<{
@@ -58,8 +58,9 @@ async function buildUtxos(address: string): Promise<Array<{
 
 const router = Router();
 
-// Validate Nusacoin address format (starts with S or R, base58)
-const ADDRESS_RE = /^[SR][1-9A-HJ-NP-Za-km-z]{25,34}$/;
+// Validate Nusacoin address format (starts with N or X, base58)
+const ADDRESS_RE = /^[N][1-9A-HJ-NP-Za-km-z]{25,34}$/;
+const ADDRESS_BECH = /\bnu1[qQ][a-zA-HJ-NP-Z0-9]{25,39}\b/;
 const TXID_RE = /^[0-9a-fA-F]{64}$/;
 
 function isValidAddress(addr: string): boolean {
@@ -70,10 +71,14 @@ function isValidTxid(txid: string): boolean {
   return TXID_RE.test(txid);
 }
 
+function isValidBech32(addr: string): boolean {
+  return ADDRESS_BECH.test(addr);
+}
+
 // GET /api/balance/:address - uses explorer API
 router.get('/balance/:address', async (req: Request<{ address: string }>, res: Response) => {
   const address = req.params.address;
-  if (!isValidAddress(address)) {
+  if (!isValidAddress(address) && !isValidBech32(address)) {
     res.status(400).json({ error: 'Invalid address' });
     return;
   }
@@ -135,7 +140,7 @@ router.get('/tx/:txid', async (req: Request<{ txid: string }>, res: Response) =>
 });
 
 // GET /api/rawtx/:txid - raw hex for signing (nonWitnessUtxo)
-router.get('/rawtx/:txid', async (req: Request<{ txid: string }>, res: Response) => {
+router.get('/rpcrawtx/:txid', async (req: Request<{ txid: string }>, res: Response) => {
   const txid = req.params.txid;
   if (!isValidTxid(txid)) {
     res.status(400).json({ error: 'Invalid txid' });
@@ -143,6 +148,21 @@ router.get('/rawtx/:txid', async (req: Request<{ txid: string }>, res: Response)
   }
   try {
     const hex = await rpcCall('getrawtransaction', [txid, false]);
+    res.json({ hex });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    res.status(500).json({ error: message });
+  }
+});
+
+router.get('/rawtx/:txid', async (req: Request<{ txid: string }>, res: Response) => {
+  const txid = req.params.txid;
+  if (!isValidTxid(txid)) {
+    res.status(400).json({ error: 'Invalid txid' });
+    return;
+  }
+  try {
+    const hex = await getRawHex(txid);
     res.json({ hex });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
