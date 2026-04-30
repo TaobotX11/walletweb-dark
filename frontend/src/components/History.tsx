@@ -13,6 +13,8 @@ function formatTime(timestamp: number): string {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit',
+    hour12: false
   });
 }
 
@@ -72,8 +74,8 @@ export function History({ address }: HistoryProps) {
       ) : (
         <div className="space-y-2">
           {txs.map((tx) => {
-            const isReceived = (tx.balance - tx.received) > 0;
-            const amount = tx.balance - tx.received;
+            const isReceived = tx.sent > tx.received;
+            const amount = isReceived ? tx.sent : tx.received - tx.sent;
 
             return (
               <div key={tx.txid} className="card flex items-center justify-between py-4">
