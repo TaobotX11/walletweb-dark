@@ -22,9 +22,10 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
 
   const maxAmount = balance ? balance.balance / COIN : 0;
   const ADDRESS_RE = /^[N][1-9A-HJ-NP-Za-km-z]{25,34}$/;
+  const ADDRESS_BECH = /\bnu1[qQ][a-zA-HJ-NP-Z0-9]{25,39}\b/
 
   const isValidForm =
-    ADDRESS_RE.test(toAddress) &&
+    (ADDRESS_RE.test(toAddress) || ADDRESS_BECH.test(toAddress)) &&
     parseFloat(amount) > 0 &&
     parseFloat(amount) <= maxAmount;
 
@@ -151,7 +152,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
             onChange={(e) => setToAddress(e.target.value.trim())}
             autoFocus
           />
-          {toAddress && !ADDRESS_RE.test(toAddress) && (
+          {toAddress && !ADDRESS_RE.test(toAddress) && !ADDRESS_BECH.test(toAddress) && (
             <p className="text-red-400 text-sm mt-1">Invalid Nusacoin address</p>
           )}
         </div>
