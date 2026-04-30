@@ -110,7 +110,7 @@ export function History({ address }: HistoryProps) {
                     className={`font-mono font-medium ${isReceived ? 'text-green-400' : 'text-red-400'
                       }`}
                   >
-                    {isReceived ? '+' : ''}
+                    {isReceived ? '+' : '-'}
                     {amount.toFixed(8)}
                   </p>
                   <p className="text-dark-500 text-xs">NUX</p>
