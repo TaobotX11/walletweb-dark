@@ -36,6 +36,23 @@ async function apiFetchUtxo<T>(path: string, options?: RequestInit): Promise<T> 
   return data.result.unspents as T;
 }
 
+async function apiFetchBroadcast<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(`${APINUSA_URL}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      ...options?.headers,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.error || `API error ${res.status}`);
+  }
+  return data as T;
+}
+
 export interface BalanceResponse {
   balance: number;   // in nusan
   received: number;  // in nusan
@@ -44,8 +61,13 @@ export interface BalanceResponse {
 
 export interface BroadcastResponse {
   result: string,
-  error: unknown,
+  error: Error,
   id: string
+}
+
+export interface Error {
+  code: number;
+  message: string;
 }
 
 export async function fetchBalance(address: string): Promise<BalanceResponse> {
@@ -76,11 +98,10 @@ export async function fetchHistory(address: string): Promise<HistoryTx[]> {
 }
 
 export async function broadcastTx(hex: string): Promise<BroadcastResponse> {
-  const params = new URLSearchParams();
-  params.append('raw', hex);
-  return apiFetchUtxo<BroadcastResponse>('/broadcast', {
+  const data = { raw: hex };
+  return apiFetchBroadcast<BroadcastResponse>('/broadcast', {
     method: 'POST',
-    body: params,
+    body: new URLSearchParams(data),
   });
 }
 
