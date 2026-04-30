@@ -72,16 +72,16 @@ export function History({ address }: HistoryProps) {
       ) : (
         <div className="space-y-2">
           {txs.map((tx) => {
-            const isReceived = tx.received > 0;
-            const amount = isReceived ? tx.received : tx.sent;
+            const isReceived = (tx.balance - tx.received) > 0;
+            const amount = tx.balance - tx.received;
 
             return (
               <div key={tx.txid} className="card flex items-center justify-between py-4">
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center ${isReceived
-                        ? 'bg-green-500/20 text-green-400'
-                        : 'bg-red-500/20 text-red-400'
+                      ? 'bg-green-500/20 text-green-400'
+                      : 'bg-red-500/20 text-red-400'
                       }`}
                   >
                     {isReceived ? (
@@ -108,7 +108,7 @@ export function History({ address }: HistoryProps) {
                     className={`font-mono font-medium ${isReceived ? 'text-green-400' : 'text-red-400'
                       }`}
                   >
-                    {isReceived ? '+' : '-'}
+                    {isReceived ? '+' : ''}
                     {amount.toFixed(8)}
                   </p>
                   <p className="text-dark-500 text-xs">NUX</p>
