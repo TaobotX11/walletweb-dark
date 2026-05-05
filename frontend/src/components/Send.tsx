@@ -21,7 +21,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
   const [txResult, setTxResult] = useState<{ txid: string; fee: number } | null>(null);
 
   const maxAmount = balance ? balance.balance / COIN : 0;
-  const ADDRESS_RE = /^[N][1-9A-HJ-NP-Za-km-z]{25,34}$/;
+  const ADDRESS_RE = /^[NX][1-9A-HJ-NP-Za-km-z]{25,34}$/;
   const ADDRESS_BECH = /\bnu1[qQ][a-zA-HJ-NP-Z0-9]{25,39}\b/
 
   const isValidForm =
@@ -147,7 +147,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
           <input
             type="text"
             className="input-field font-mono text-sm"
-            placeholder="N..."
+            placeholder="N/X/nu1q..."
             value={toAddress}
             onChange={(e) => setToAddress(e.target.value.trim())}
             autoFocus

@@ -59,7 +59,7 @@ async function buildUtxos(address: string): Promise<Array<{
 const router = Router();
 
 // Validate Nusacoin address format (starts with N or X, base58)
-const ADDRESS_RE = /^[N][1-9A-HJ-NP-Za-km-z]{25,34}$/;
+const ADDRESS_RE = /^[NX][1-9A-HJ-NP-Za-km-z]{25,34}$/;
 const ADDRESS_BECH = /\bnu1[qQ][a-zA-HJ-NP-Z0-9]{25,39}\b/;
 const TXID_RE = /^[0-9a-fA-F]{64}$/;
 
