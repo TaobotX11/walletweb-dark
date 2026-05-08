@@ -5,6 +5,7 @@ import { BackupMnemonic } from './components/BackupMnemonic';
 import { UnlockWallet } from './components/UnlockWallet';
 import { ImportWallet } from './components/ImportWallet';
 import { Dashboard } from './components/Dashboard';
+import { Legacy } from './components/Legacy';
 import { Send } from './components/Send';
 import { Receive } from './components/Receive';
 import { History } from './components/History';
@@ -13,8 +14,8 @@ import { useWallet, type WalletView } from './hooks/useWallet';
 function App() {
   const wallet = useWallet();
 
-  const isLoggedIn = !!wallet.privateKey && !!wallet.walletData;
-  const navViews = ['dashboard', 'send', 'receive', 'history'];
+  const isLoggedIn = !!wallet.privateKeyBech32 && !!wallet.privateKey && !!wallet.walletData;
+  const navViews = ['dashboard', 'legacy', 'send', 'receive', 'history'];
 
   const renderContent = () => {
     switch (wallet.view) {
@@ -95,7 +96,7 @@ function App() {
       case 'unlock':
         return wallet.walletData ? (
           <UnlockWallet
-            address={wallet.walletData.address}
+            address={wallet.walletData.bech32address}
             onUnlock={wallet.handleUnlock}
             onLogout={wallet.handleLogout}
             loading={wallet.loading}
@@ -107,21 +108,39 @@ function App() {
         return wallet.walletData ? (
           <Dashboard
             address={wallet.walletData.address}
-            balance={wallet.balance}
-            onRefresh={wallet.refreshBalance}
-            onSend={() => wallet.setView('send')}
+            bech32address={wallet.walletData.bech32address}
+            balance={wallet.balancebech32}
+            isBech32={wallet.trxType}
+            onRefresh={() => wallet.refreshBalanceBech32()}
+            onSend={() => { wallet.setView('send'); wallet.setBech32(true); }}
             onReceive={() => wallet.setView('receive')}
+
+          />
+        ) : null;
+
+      case 'legacy':
+        return wallet.walletData ? (
+          <Legacy
+            address={wallet.walletData.address}
+            balance={wallet.balance}
+            isBech32={wallet.trxType}
+            onRefreshTwo={() => wallet.refreshBalance()}
+            onSend={() => { wallet.setView('send'); wallet.setBech32(false); }}
           />
         ) : null;
 
       case 'send':
-        return wallet.walletData && wallet.privateKey ? (
+        return wallet.walletData && wallet.privateKey && wallet.privateKeyBech32 ? (
           <Send
             address={wallet.walletData.address}
+            bech32address={wallet.walletData.bech32address}
             privateKey={wallet.privateKey}
+            privateKeyBech32={wallet.privateKeyBech32}
             balance={wallet.balance}
+            balanceBech32={wallet.balancebech32}
+            isBech32={wallet.trxType}
             onDone={() => {
-              wallet.refreshBalance();
+              wallet.refreshBalanceBech32();
               wallet.setView('dashboard');
             }}
           />
@@ -129,12 +148,12 @@ function App() {
 
       case 'receive':
         return wallet.walletData ? (
-          <Receive address={wallet.walletData.address} />
+          <Receive address={wallet.walletData.bech32address} />
         ) : null;
 
       case 'history':
         return wallet.walletData ? (
-          <History address={wallet.walletData.address} />
+          <History address={wallet.walletData.bech32address} />
         ) : null;
 
       default:

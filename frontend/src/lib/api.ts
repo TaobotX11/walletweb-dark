@@ -59,6 +59,16 @@ export interface BalanceResponse {
   sent: number;      // in nusan
 }
 
+export interface TrxResponse {
+  isbech32: boolean;      // in nusan
+}
+
+export interface BalanceBech32Response {
+  balance: number;   // in nusan
+  received: number;  // in nusan
+  sent: number;      // in nusan
+}
+
 export interface BroadcastResponse {
   result: string,
   error: Error,
@@ -72,6 +82,10 @@ export interface Error {
 
 export async function fetchBalance(address: string): Promise<BalanceResponse> {
   return apiFetch<BalanceResponse>(`/balance/${address}`);
+}
+
+export async function fetchBalanceBech32(address: string): Promise<BalanceBech32Response> {
+  return apiFetch<BalanceBech32Response>(`/balance/${address}`);
 }
 
 export async function fetchUtxos(address: string): Promise<UTXO[]> {

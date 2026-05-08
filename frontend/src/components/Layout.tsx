@@ -57,6 +57,7 @@ export function Layout({
           <div className="max-w-2xl mx-auto px-4 flex gap-1">
             {[
               { id: 'dashboard', label: 'Wallet' },
+              { id: 'legacy', label: 'Legacy' },
               { id: 'send', label: 'Send' },
               { id: 'receive', label: 'Receive' },
               { id: 'history', label: 'History' },
@@ -65,7 +66,7 @@ export function Layout({
                 key={tab.id}
                 onClick={() => onNavigate(tab.id)}
                 className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${activeView === tab.id
-                  ? 'border-nux-500 text-nux-400'
+                  ? tab.id === 'legacy' ? 'border-orange-500 text-orange-400' : 'border-nux-500 text-nux-400'
                   : 'border-transparent text-dark-400 hover:text-white'
                   }`}
               >

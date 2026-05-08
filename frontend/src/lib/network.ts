@@ -19,6 +19,7 @@ export const nusacoin: networks.Network = {
 
 export const BIP44_COIN_TYPE = 662;
 export const DERIVATION_PATH = `m/44'/${BIP44_COIN_TYPE}'/0'/0/0`;
+export const DERIVATION_PATH_84 = `m/84'/${BIP44_COIN_TYPE}'/0'/0/0`;
 
 // 1 NUX = 100,000,000 nusan
 export const COIN = 100_000_000;
@@ -27,5 +28,5 @@ export const COIN = 100_000_000;
 export const MIN_FEE_RATE = 1;
 export const DEFAULT_FEE_RATE = 3;
 
-export const API_BASE = '/api';
-export const APINUSA_URL = 'https://apinusa.taobot.org';
+export const API_BASE = 'http://localhost:3001/api'; //change this 
+export const APINUSA_URL = 'https://apinusa.taobot.org'; //change this

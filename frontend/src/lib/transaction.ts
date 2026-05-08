@@ -1,4 +1,4 @@
-import { Psbt, Transaction } from 'bitcoinjs-lib';
+import { Psbt, Transaction, payments } from 'bitcoinjs-lib';
 import ECPairFactory, { type ECPairAPI } from 'ecpair';
 import * as ecc from 'tiny-secp256k1';
 import { Buffer } from 'buffer';
@@ -44,15 +44,18 @@ async function fetchRawTxHex(txid: string): Promise<string> {
 // Build and sign a transaction
 export async function buildTransaction(params: {
   fromAddress: string;
+  fromBech32: string;
   toAddress: string;
   amountNusan: number;
   privateKey: Uint8Array;
+  privateKeyBech32: Uint8Array;
+  isBech32: boolean,
   feeRate?: number;
 }): Promise<{ hex: string; fee: number; txid: string }> {
-  const { fromAddress, toAddress, amountNusan, privateKey, feeRate = DEFAULT_FEE_RATE } = params;
+  const { fromAddress, fromBech32, toAddress, amountNusan, privateKey, privateKeyBech32, isBech32, feeRate = DEFAULT_FEE_RATE } = params;
 
   // Fetch UTXOs for the sender
-  const utxos: UTXO[] = await fetchUtxos(fromAddress);
+  const utxos: UTXO[] = await fetchUtxos(isBech32 ? fromBech32 : fromAddress);
 
   if (utxos.length === 0) {
     throw new Error('No spendable outputs found');
@@ -78,12 +81,14 @@ export async function buildTransaction(params: {
     }
   }
 
-  if (totalInput < amountNusan + estimatedFee) {
-    const available = totalInput / COIN;
-    const needed = (amountNusan + estimatedFee) / COIN;
-    throw new Error(
-      `Insufficient funds. Available: ${available.toFixed(8)} NUX, Needed: ${needed.toFixed(8)} NUX (including fee)`
-    );
+  if (isBech32) {
+    if (totalInput < amountNusan + estimatedFee) {
+      const available = totalInput / COIN;
+      const needed = (amountNusan + estimatedFee) / COIN;
+      throw new Error(
+        `Insufficient funds. Available: ${available.toFixed(8)} NUX, Needed: ${needed.toFixed(8)} NUX (including fee)`
+      );
+    }
   }
 
   // Fetch raw transactions for nonWitnessUtxo (required for P2PKH signing)
@@ -100,40 +105,61 @@ export async function buildTransaction(params: {
     network: nusacoin,
   });
 
+  const keyPair2 = getECPair().fromPrivateKey(Buffer.from(privateKeyBech32), {
+    network: nusacoin,
+  });
+
+  const p2wpkh = payments.p2wpkh({ pubkey: keyPair2.publicKey, network: nusacoin });
+
   const psbt = new Psbt({ network: nusacoin });
 
   // Add inputs with nonWitnessUtxo for P2PKH
-  for (const utxo of selected) {
-    psbt.addInput({
-      hash: utxo.txid,
-      index: utxo.outputIndex,
-      nonWitnessUtxo: rawTxCache.get(utxo.txid)!,
-    });
+  if (!isBech32) {
+    for (const utxo of selected) {
+      psbt.addInput({
+        hash: utxo.txid,
+        index: utxo.outputIndex,
+        nonWitnessUtxo: rawTxCache.get(utxo.txid)!,
+      });
+    }
+  } else {
+    for (const utxo of selected) {
+      psbt.addInput({ hash: utxo.txid, index: utxo.outputIndex, witnessUtxo: { script: p2wpkh.output!, value: utxo.satoshis } })
+    }
   }
 
   // Payment output
-  psbt.addOutput({
-    address: toAddress,
-    value: amountNusan,
-  });
+  if (isBech32) {
+    psbt.addOutput({
+      address: toAddress,
+      value: amountNusan,
+    });
+  } else {
+    psbt.addOutput({
+      address: toAddress,
+      value: totalInput - estimatedFee,
+    });
+  }
 
   // Change output (if change > dust threshold)
   const change = totalInput - amountNusan - estimatedFee;
   const DUST_THRESHOLD = 546;
 
-  if (change > DUST_THRESHOLD) {
+  if (change > DUST_THRESHOLD && isBech32) {
     psbt.addOutput({
-      address: fromAddress,
+      address: fromBech32,
       value: change,
     });
-  } else {
     // No change output, fee absorbs the dust
     estimatedFee = totalInput - amountNusan;
   }
 
   // Sign all inputs
   for (let i = 0; i < selected.length; i++) {
-    psbt.signInput(i, keyPair);
+    if (!isBech32)
+      psbt.signInput(i, keyPair);
+    else
+      psbt.signInput(i, keyPair2);
   }
 
   psbt.finalizeAllInputs();

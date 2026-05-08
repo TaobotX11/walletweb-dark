@@ -1,23 +1,28 @@
 import { useEffect } from 'react';
 import { nusanToNux } from '../lib/transaction';
-import type { BalanceResponse } from '../lib/api';
+import type { BalanceBech32Response } from '../lib/api';
 
 interface DashboardProps {
   address: string;
-  balance: BalanceResponse | null;
+  bech32address: string;
+  balance: BalanceBech32Response | null;
+  isBech32: boolean;
   onRefresh: () => void;
   onSend: () => void;
   onReceive: () => void;
 }
 
-export function Dashboard({ address, balance, onRefresh, onSend, onReceive }: DashboardProps) {
+export function Dashboard({ bech32address, balance, onRefresh, onSend, onReceive }: DashboardProps) {
   useEffect(() => {
-    onRefresh();
-    const interval = setInterval(onRefresh, 30000); // Refresh every 30s
+    //onRefresh();
+    const interval = setInterval(onRefresh, 7000); // Refresh every 30s
     return () => clearInterval(interval);
   }, [onRefresh]);
 
+  //const [isActive, setIsActive] = useState<boolean>(true);
   const balancenux = balance ? nusanToNux(balance.balance) : '---';
+
+
 
   return (
     <div className="space-y-6">
@@ -29,7 +34,7 @@ export function Dashboard({ address, balance, onRefresh, onSend, onReceive }: Da
           <span className="text-lg text-dark-400 ml-2">NUX</span>
         </h2>
         {balance && balance.received > 0 && (
-          <p className="text-dark-500 text-sm mt-2">
+          <p className="text-2xl text-sm mt-2">
             Total received: {nusanToNux(balance.received)} NUX
           </p>
         )}
@@ -47,10 +52,10 @@ export function Dashboard({ address, balance, onRefresh, onSend, onReceive }: Da
 
       {/* Address Info */}
       <div className="card">
-        <p className="text-dark-400 text-sm mb-2">Your Address</p>
-        <p className="font-mono text-sm break-all text-dark-200">{address}</p>
+        <p className="text-dark-400 text-sm mb-2">Bech32 Address</p>
+        <p className="font-mono text-sm break-all text-dark-200">{bech32address}</p>
         <button
-          onClick={() => navigator.clipboard.writeText(address)}
+          onClick={() => navigator.clipboard.writeText(bech32address)}
           className="text-nux-400 text-sm mt-2 hover:text-nux-300 transition-colors"
         >
           Copy address

@@ -2,18 +2,22 @@ import React, { useState } from 'react';
 import { buildTransaction, nuxToNusan, nusanToNux } from '../lib/transaction';
 import { broadcastTx } from '../lib/api';
 import { COIN } from '../lib/network';
-import type { BalanceResponse } from '../lib/api';
+import type { BalanceBech32Response, BalanceResponse } from '../lib/api';
 
 interface SendProps {
   address: string;
+  bech32address: string;
   privateKey: Uint8Array;
+  privateKeyBech32: Uint8Array;
+  isBech32: boolean,
   balance: BalanceResponse | null;
+  balanceBech32: BalanceBech32Response | null;
   onDone: () => void;
 }
 
 type SendStep = 'form' | 'confirm' | 'sending' | 'success';
 
-export function Send({ address, privateKey, balance, onDone }: SendProps) {
+export function Send({ address, bech32address, privateKey, privateKeyBech32, balance, balanceBech32, isBech32, onDone }: SendProps) {
   const [step, setStep] = useState<SendStep>('form');
   const [toAddress, setToAddress] = useState('');
   const [amount, setAmount] = useState('');
@@ -21,6 +25,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
   const [txResult, setTxResult] = useState<{ txid: string; fee: number } | null>(null);
 
   const maxAmount = balance ? balance.balance / COIN : 0;
+  const maxAmountBech32 = balanceBech32 ? balanceBech32.balance / COIN : 0;
   const ADDRESS_RE = /^[NX][1-9A-HJ-NP-Za-km-z]{25,34}$/;
   const ADDRESS_BECH = /\bnu1[qQ][a-zA-HJ-NP-Z0-9]{25,39}\b/
 
@@ -37,9 +42,12 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
       const amountNusan = nuxToNusan(amount);
       const tx = await buildTransaction({
         fromAddress: address,
+        fromBech32: bech32address,
         toAddress,
         amountNusan,
         privateKey,
+        privateKeyBech32,
+        isBech32
       });
 
       const result = await broadcastTx(tx.hex);
@@ -69,7 +77,7 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
         <div className="card text-left space-y-3">
           <div>
             <p className="text-dark-400 text-xs">Amount</p>
-            <p className="font-mono">{amount} NUX</p>
+            <p className="font-mono">{isBech32 ? amount : maxAmount - parseFloat(nusanToNux(txResult.fee))} NUX</p>
           </div>
           <div>
             <p className="text-dark-400 text-xs">Fee</p>
@@ -167,24 +175,24 @@ export function Send({ address, privateKey, balance, onDone }: SendProps) {
               className="input-field pr-16"
               placeholder="0.00"
               value={amount}
+              readOnly={!isBech32}
               onChange={(e) => setAmount(e.target.value)}
               step="0.00000001"
               min="0.00000001"
-              max={maxAmount}
+              max={isBech32 ? maxAmountBech32 : maxAmount}
             />
             <button
               type="button"
-              onClick={() => setAmount(maxAmount.toFixed(8))}
+              onClick={() => setAmount(isBech32 ? maxAmountBech32.toFixed(8) : maxAmount.toFixed(8))}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-nux-400 hover:text-nux-300"
             >
               MAX
             </button>
           </div>
           <p className="text-dark-500 text-xs mt-1">
-            Available: {maxAmount.toFixed(8)} NUX
+            Available: {isBech32 ? maxAmountBech32.toFixed(8) : maxAmount.toFixed(8)} NUX
           </p>
         </div>
-
         <button type="submit" disabled={!isValidForm} className="btn-primary w-full">
           Continue
         </button>

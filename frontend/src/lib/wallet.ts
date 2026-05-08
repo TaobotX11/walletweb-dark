@@ -3,7 +3,7 @@ import BIP32Factory, { type BIP32API } from 'bip32';
 import * as ecc from 'tiny-secp256k1';
 import { payments } from 'bitcoinjs-lib';
 import { Buffer } from 'buffer';
-import { nusacoin, DERIVATION_PATH } from './network';
+import { nusacoin, DERIVATION_PATH, DERIVATION_PATH_84 } from './network';
 
 let _bip32: BIP32API | null = null;
 function getBip32(): BIP32API {
@@ -13,8 +13,10 @@ function getBip32(): BIP32API {
 
 export interface WalletData {
   address: string;
+  bech32address: string;
   encryptedMnemonic: string;
   encryptedPrivKey: string;
+  encryptedPrivKeyBech32: string;
 }
 
 // Generate a new 12-word mnemonic
@@ -25,14 +27,17 @@ export function generateMnemonic(): string {
 // Derive address and private key from mnemonic
 export function deriveFromMnemonic(mnemonic: string): {
   address: string;
+  bech32address: string;
   privateKey: Uint8Array;
+  privateKeyBech32: Uint8Array;
   publicKey: Uint8Array;
 } {
   const seed = bip39.mnemonicToSeedSync(mnemonic);
   const root = getBip32().fromSeed(Buffer.from(seed), nusacoin);
   const child = root.derivePath(DERIVATION_PATH);
+  const child_bech = root.derivePath(DERIVATION_PATH_84);
 
-  if (!child.privateKey) {
+  if (!child.privateKey || !child_bech.privateKey) {
     throw new Error('Failed to derive private key');
   }
 
@@ -41,13 +46,16 @@ export function deriveFromMnemonic(mnemonic: string): {
     network: nusacoin,
   });
 
-  if (!address) {
+  const bech32address = payments.p2wpkh({ pubkey: Buffer.from(child_bech.publicKey), network: nusacoin }).address;
+  if (!address || !bech32address) {
     throw new Error('Failed to derive address');
   }
 
   return {
     address,
+    bech32address: bech32address,
     privateKey: child.privateKey,
+    privateKeyBech32: child_bech.privateKey,
     publicKey: child.publicKey,
   };
 }
@@ -127,16 +135,20 @@ export async function createWallet(password: string): Promise<{
   mnemonic: string;
 }> {
   const mnemonic = generateMnemonic();
-  const { address, privateKey } = deriveFromMnemonic(mnemonic);
+  const { address, bech32address, privateKey, privateKeyBech32 } = deriveFromMnemonic(mnemonic);
 
   const encryptedMnemonic = await encrypt(mnemonic, password);
   const encryptedPrivKey = await encrypt(
     Buffer.from(privateKey).toString('hex'),
     password
   );
+  const encryptedPrivKeyBech32 = await encrypt(
+    Buffer.from(privateKeyBech32).toString('hex'),
+    password
+  );
 
   return {
-    walletData: { address, encryptedMnemonic, encryptedPrivKey },
+    walletData: { address, bech32address, encryptedMnemonic, encryptedPrivKey, encryptedPrivKeyBech32 },
     mnemonic,
   };
 }
@@ -150,7 +162,7 @@ export async function importWallet(
     throw new Error('Invalid mnemonic phrase');
   }
 
-  const { address, privateKey } = deriveFromMnemonic(mnemonic.trim().toLowerCase());
+  const { address, bech32address, privateKey, privateKeyBech32 } = deriveFromMnemonic(mnemonic.trim().toLowerCase());
 
   const encryptedMnemonic = await encrypt(mnemonic.trim().toLowerCase(), password);
   const encryptedPrivKey = await encrypt(
@@ -158,18 +170,25 @@ export async function importWallet(
     password
   );
 
-  return { address, encryptedMnemonic, encryptedPrivKey };
+  const encryptedPrivKeyBech32 = await encrypt(
+    Buffer.from(privateKeyBech32).toString('hex'),
+    password
+  );
+
+  return { address, bech32address, encryptedMnemonic, encryptedPrivKey, encryptedPrivKeyBech32 };
 }
 
 // Unlock wallet (decrypt private key)
 export async function unlockWallet(
   walletData: WalletData,
   password: string
-): Promise<{ privateKey: Uint8Array; mnemonic: string }> {
+): Promise<{ privateKeyBech32: Uint8Array, privateKey: Uint8Array; mnemonic: string }> {
   const mnemonic = await decrypt(walletData.encryptedMnemonic, password);
   const privKeyHex = await decrypt(walletData.encryptedPrivKey, password);
+  const privKeyHexBech32 = await decrypt(walletData.encryptedPrivKeyBech32, password);
 
   return {
+    privateKeyBech32: Uint8Array.from(Buffer.from(privKeyHexBech32, 'hex')),
     privateKey: Uint8Array.from(Buffer.from(privKeyHex, 'hex')),
     mnemonic,
   };

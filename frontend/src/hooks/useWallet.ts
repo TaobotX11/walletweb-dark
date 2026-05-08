@@ -17,6 +17,7 @@ export type WalletView =
   | 'import'
   | 'unlock'
   | 'dashboard'
+  | 'legacy'
   | 'send'
   | 'receive'
   | 'history';
@@ -25,8 +26,11 @@ export interface WalletState {
   view: WalletView;
   walletData: WalletData | null;
   privateKey: Uint8Array | null;
+  privateKeyBech32: Uint8Array | null;
   mnemonic: string | null;
   balance: BalanceResponse | null;
+  balancebech32: BalanceResponse | null;
+  trxType: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -36,8 +40,11 @@ export function useWallet() {
     view: 'landing',
     walletData: null,
     privateKey: null,
+    privateKeyBech32: null,
     mnemonic: null,
     balance: null,
+    balancebech32: null,
+    trxType: true,
     loading: false,
     error: null,
   });
@@ -52,6 +59,10 @@ export function useWallet() {
 
   const setView = useCallback((view: WalletView) => {
     setState((s) => ({ ...s, view, error: null }));
+  }, []);
+
+  const setBech32 = useCallback((trxType: boolean) => {
+    setState((s) => ({ ...s, trxType }));
   }, []);
 
   const setError = useCallback((error: string | null) => {
@@ -98,9 +109,10 @@ export function useWallet() {
       if (!state.walletData) return;
       setState((s) => ({ ...s, loading: true, error: null }));
       try {
-        const { privateKey, mnemonic } = await unlockWallet(state.walletData, password);
+        const { privateKeyBech32, privateKey, mnemonic } = await unlockWallet(state.walletData, password);
         setState((s) => ({
           ...s,
+          privateKeyBech32,
           privateKey,
           mnemonic,
           loading: false,
@@ -120,9 +132,11 @@ export function useWallet() {
   const handleLock = useCallback(() => {
     setState((s) => ({
       ...s,
+      privateKeyBech32: null,
       privateKey: null,
       mnemonic: null,
       balance: null,
+      balancebech32: null,
       view: 'unlock',
     }));
   }, []);
@@ -133,8 +147,11 @@ export function useWallet() {
       view: 'landing',
       walletData: null,
       privateKey: null,
+      privateKeyBech32: null,
       mnemonic: null,
       balance: null,
+      balancebech32: null,
+      trxType: true,
       loading: false,
       error: null,
     });
@@ -150,15 +167,27 @@ export function useWallet() {
     }
   }, [state.walletData]);
 
+  const refreshBalanceBech32 = useCallback(async () => {
+    if (!state.walletData) return;
+    try {
+      const balancebech32 = await fetchBalance(state.walletData.bech32address);
+      setState((s) => ({ ...s, balancebech32 }));
+    } catch {
+      // Silently fail balance refresh
+    }
+  }, [state.walletData]);
+
   return {
     ...state,
     setView,
     setError,
+    setBech32,
     handleCreate,
     handleImport,
     handleUnlock,
     handleLock,
     handleLogout,
     refreshBalance,
+    refreshBalanceBech32
   };
 }

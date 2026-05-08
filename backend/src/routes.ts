@@ -94,7 +94,7 @@ router.get('/balance/:address', async (req: Request<{ address: string }>, res: R
 // GET /api/utxos/:address - builds UTXOs from explorer + RPC
 router.get('/utxos/:address', async (req: Request<{ address: string }>, res: Response) => {
   const address = req.params.address;
-  if (!isValidAddress(address)) {
+  if (!isValidAddress(address) && !isValidBech32(address)) {
     res.status(400).json({ error: 'Invalid address' });
     return;
   }
@@ -110,7 +110,7 @@ router.get('/utxos/:address', async (req: Request<{ address: string }>, res: Res
 // GET /api/history/:address - uses explorer API directly
 router.get('/history/:address', async (req: Request<{ address: string }>, res: Response) => {
   const address = req.params.address;
-  if (!isValidAddress(address)) {
+  if (!isValidAddress(address) && !isValidBech32(address)) {
     res.status(400).json({ error: 'Invalid address' });
     return;
   }
