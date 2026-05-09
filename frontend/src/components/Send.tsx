@@ -180,8 +180,8 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
               value={isBech32 ? amount : maxAmount.toFixed(8)}
               readOnly={!isBech32}
               onChange={(e) => setAmount(e.target.value)}
-              step="0.00000001"
-              min="0.00000001"
+              step="0.00001000"
+              min="0.00001000"
               max={isBech32 ? maxAmountBech32 : maxAmount}
             />
             <button
