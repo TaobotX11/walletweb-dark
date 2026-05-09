@@ -66,7 +66,7 @@ export function History({ address }: HistoryProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Transaction History</h2>
-      <p className="text-dark-400 text-xl mb-2">{address}</p>
+      <p className="text-dark-400 text-sm mb-2">{address}</p>
 
       {txs.length === 0 ? (
         <div className="card text-center py-12 text-dark-400">
@@ -101,8 +101,8 @@ export function History({ address }: HistoryProps) {
                     <p className="font-medium text-sm">
                       {isReceived ? 'Received' : 'Sent'}
                     </p>
-                    <p className="font-medium text-sm">
-                      <a href={`https://book.taobot.org/tx/${tx.txid}`} target="_blank">. . . {tx.txid.slice(8, 32)} . . .</a>
+                    <p className="text-dark-300 text-xs">
+                      <a href={`https://book.taobot.org/tx/${tx.txid}`} target="_blank">{tx.txid.slice(8, 32)}</a>
                     </p>
                     <p className="text-dark-500 text-xs">
                       {formatTime(tx.timestamp)}
