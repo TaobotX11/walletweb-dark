@@ -8,12 +8,13 @@ interface LegacyProps {
     isBech32: boolean,
     onSend: () => void;
     onRefreshTwo: () => void;
+    onHistory: () => void;
 }
 
-export function Legacy({ address, balance, onRefreshTwo, onSend }: LegacyProps) {
+export function Legacy({ address, balance, onRefreshTwo, onSend, onHistory }: LegacyProps) {
     useEffect(() => {
-        //onRefreshTwo();
-        const interval = setInterval(onRefreshTwo, 7000); // Refresh every 30s
+        onRefreshTwo();
+        const interval = setInterval(onRefreshTwo, 60000); // Refresh every 60s
         return () => clearInterval(interval);
     }, [onRefreshTwo]);
     const balancenux = balance ? nusanToNux(balance.balance) : '---';
@@ -49,6 +50,13 @@ export function Legacy({ address, balance, onRefreshTwo, onSend }: LegacyProps) 
                     className="text-orange-400 text-sm mt-2 hover:text-orange-300 transition-colors"
                 >
                     Copy address
+                </button>
+                <p></p>
+                <button
+                    onClick={onHistory}
+                    className="text-orange-400 text-sm mt-2 hover:text-orange-300 transition-colors"
+                >
+                    History
                 </button>
             </div>
         </div>

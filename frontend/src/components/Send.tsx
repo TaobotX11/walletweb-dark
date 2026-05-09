@@ -140,6 +140,7 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">Send NUX</h2>
+      <p className="text-dark-400 text-xl mb-2">{isBech32 ? bech32address : address}</p>
 
       <form
         onSubmit={(e: React.FormEvent) => {
@@ -174,7 +175,7 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
               type="number"
               className="input-field pr-16"
               placeholder="0.00"
-              value={amount}
+              value={isBech32 ? amount : maxAmount.toFixed(8)}
               readOnly={!isBech32}
               onChange={(e) => setAmount(e.target.value)}
               step="0.00000001"

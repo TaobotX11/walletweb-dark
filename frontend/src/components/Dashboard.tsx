@@ -7,17 +7,20 @@ interface DashboardProps {
   bech32address: string;
   balance: BalanceBech32Response | null;
   isBech32: boolean;
+  onInit: () => void;
   onRefresh: () => void;
   onSend: () => void;
   onReceive: () => void;
 }
 
-export function Dashboard({ bech32address, balance, onRefresh, onSend, onReceive }: DashboardProps) {
+export function Dashboard({ bech32address, balance, onInit, onRefresh, onSend, onReceive }: DashboardProps) {
   useEffect(() => {
-    //onRefresh();
-    const interval = setInterval(onRefresh, 10000); // Refresh every 30s
+    onInit();
+    onRefresh();
+    const interval = setInterval(onRefresh, 30000); // Refresh every 30s
     return () => clearInterval(interval);
   }, [onRefresh]);
+
 
   //const [isActive, setIsActive] = useState<boolean>(true);
   const balancenux = balance ? nusanToNux(balance.balance) : '---';
