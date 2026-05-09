@@ -15,7 +15,7 @@ interface DashboardProps {
 export function Dashboard({ bech32address, balance, onRefresh, onSend, onReceive }: DashboardProps) {
   useEffect(() => {
     //onRefresh();
-    const interval = setInterval(onRefresh, 7000); // Refresh every 30s
+    const interval = setInterval(onRefresh, 10000); // Refresh every 30s
     return () => clearInterval(interval);
   }, [onRefresh]);
 
