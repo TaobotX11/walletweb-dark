@@ -32,14 +32,16 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
   const isValidForm =
     (ADDRESS_RE.test(toAddress) || ADDRESS_BECH.test(toAddress)) &&
     parseFloat(amount) > 0 &&
-    parseFloat(amount) <= maxAmount;
+    (parseFloat(amount) <= maxAmount || parseFloat(amount) <= maxAmountBech32);
+
+  const isValidLegacy = (ADDRESS_RE.test(toAddress) || ADDRESS_BECH.test(toAddress)) && maxAmount > 0;
 
   const handleConfirm = async () => {
     setStep('sending');
     setError(null);
 
     try {
-      const amountNusan = nuxToNusan(amount);
+      const amountNusan = isBech32 ? nuxToNusan(amount) : maxAmount * COIN;
       const tx = await buildTransaction({
         fromAddress: address,
         fromBech32: bech32address,
@@ -107,7 +109,7 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
           </div>
           <div>
             <p className="text-dark-400 text-xs">Amount</p>
-            <p className="text-xl font-bold">{amount} NUX</p>
+            <p className="text-xl font-bold">{isBech32 ? amount : maxAmount.toFixed(8)} NUX</p>
           </div>
         </div>
 
@@ -145,7 +147,7 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
       <form
         onSubmit={(e: React.FormEvent) => {
           e.preventDefault();
-          if (isValidForm) setStep('confirm');
+          if (isValidForm || isValidLegacy) setStep('confirm');
         }}
         className="space-y-4"
       >
@@ -194,7 +196,7 @@ export function Send({ address, bech32address, privateKey, privateKeyBech32, bal
             Available: {isBech32 ? maxAmountBech32.toFixed(8) : maxAmount.toFixed(8)} NUX
           </p>
         </div>
-        <button type="submit" disabled={!isValidForm} className="btn-primary w-full">
+        <button type="submit" disabled={isBech32 ? !isValidForm : !isValidLegacy} className="btn-primary w-full">
           Continue
         </button>
       </form>
