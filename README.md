@@ -16,6 +16,8 @@ Your keys are generated and stored **only in your browser**, encrypted with your
 
 - **Create a new wallet** — generates a BIP39 12-word recovery phrase
 - **Import an existing wallet** — restore from your 12-word recovery phrase
+- **Wallet** — Provide Bech32 Address
+- **Legacy** — Provide Legacy Address
 - **Send NUX** — build and sign transactions entirely in the browser
 - **Receive NUX** — display your address with a QR code for easy sharing
 - **Transaction history** — view your recent incoming and outgoing transactions
