@@ -29,7 +29,7 @@ Your keys are generated and stored **only in your browser**, encrypted with your
 
 - **Non-custodial / Self-custody** — your private keys never leave your browser
 - **AES-256-GCM encryption** — wallet data encrypted with your password (PBKDF2, 600,000 iterations)
-- **BIP39 / BIP44 standard** — 12-word mnemonic, HD key derivation (`m/44'/662'/0'/0/0`)
+- **BIP39 / BIP44 / BIP84 standard** — 12-word mnemonic, HD key derivation (`m/44'/662'/0'/0/0`)
 - **No server-side accounts** — nothing to hack on the server
 - **No tracking, no analytics** — your privacy is respected
 - **Rate-limited API** — protection against abuse
