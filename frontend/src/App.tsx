@@ -111,10 +111,10 @@ function App() {
             bech32address={wallet.walletData.bech32address}
             balance={wallet.balancebech32}
             isBech32={wallet.trxType}
-            onRefresh={() => wallet.refreshBalanceBech32()}
+            onInit={() => { wallet.setBech32(true) }}
+            onRefresh={wallet.refreshBalanceBech32}
             onSend={() => { wallet.setView('send'); wallet.setBech32(true); }}
             onReceive={() => wallet.setView('receive')}
-
           />
         ) : null;
 
@@ -124,8 +124,9 @@ function App() {
             address={wallet.walletData.address}
             balance={wallet.balance}
             isBech32={wallet.trxType}
-            onRefreshTwo={() => wallet.refreshBalance()}
+            onRefreshTwo={wallet.refreshBalance}
             onSend={() => { wallet.setView('send'); wallet.setBech32(false); }}
+            onHistory={() => { wallet.setBech32(false); wallet.setView('history'); }}
           />
         ) : null;
 
@@ -142,6 +143,7 @@ function App() {
             onDone={() => {
               wallet.refreshBalanceBech32();
               wallet.setView('dashboard');
+              wallet.setBech32(true);
             }}
           />
         ) : null;
@@ -153,7 +155,7 @@ function App() {
 
       case 'history':
         return wallet.walletData ? (
-          <History address={wallet.walletData.bech32address} />
+          <History address={wallet.trxType ? wallet.walletData.bech32address : wallet.walletData.address} />
         ) : null;
 
       default:
