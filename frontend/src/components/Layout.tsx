@@ -58,7 +58,6 @@ export function Layout({
             {[
               { id: 'dashboard', label: 'Wallet' },
               { id: 'legacy', label: 'Legacy' },
-              { id: 'send', label: 'Send' },
               { id: 'receive', label: 'Receive' },
               { id: 'history', label: 'History' },
             ].map((tab) => (
