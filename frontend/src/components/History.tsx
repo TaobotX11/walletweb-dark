@@ -101,11 +101,11 @@ export function History({ address }: HistoryProps) {
                     <p className="font-medium text-sm">
                       {isReceived ? 'Received' : 'Sent'}
                     </p>
-                    <p className="text-dark-300 text-xs">
-                      <a href={`https://book.taobot.org/tx/${tx.txid}`} target="_blank">{tx.txid.slice(8, 32)}</a>
-                    </p>
                     <p className="text-dark-500 text-xs">
                       {formatTime(tx.timestamp)}
+                    </p>
+                    <p className="text-dark-400 text-xs">
+                      <a href={`https://book.taobot.org/tx/${tx.txid}`} target="_blank">{tx.txid.slice(8, 28)}...</a>
                     </p>
                   </div>
                 </div>
