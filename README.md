@@ -1,4 +1,4 @@
-# Nusacoin Web Wallet v1.1.0
+# Nusacoin Web Wallet v1.2.0
 
 **Unofficial non-custodial (self-custody) web wallet for Nusacoin (NUX).**
 
