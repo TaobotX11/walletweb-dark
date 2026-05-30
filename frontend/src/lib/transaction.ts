@@ -150,6 +150,7 @@ export async function buildTransaction(params: {
       address: fromBech32,
       value: change,
     });
+  } else {
     // No change output, fee absorbs the dust
     estimatedFee = totalInput - amountNusan;
   }
