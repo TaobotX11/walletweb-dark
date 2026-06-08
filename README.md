@@ -87,8 +87,9 @@ The backend is a lightweight API proxy that connects to a Nusacoin full node. It
 | P2SH prefix | `0x4b` (addresses start with **X**) |
 | WIF prefix | `0x57` |
 | bech32_hrp | `nu` |
-| BIP44 coin type | `662` |
-| Derivation path | `m/44'/662'/0'/0/0` |
+| coin type | `662` |
+| Derivation path BIP44 | `m/44'/662'/0'/0/0` |
+| Derivation path BIP84 | `m/84'/662'/0'/0/0` |
 | Smallest unit | 1 nusan = 0.00000001 NUX |
 
 ## Self-Hosting
