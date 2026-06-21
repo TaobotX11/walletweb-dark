@@ -41,7 +41,7 @@ Your keys are generated and stored **only in your browser**, encrypted with your
 
 ```
 ┌──────────────────────────┐          ┌──────────────────────────┐
-│  Your Browser            │  HTTPS   │  Server                  │
+│  Your Browser            │  HTTPS   │  Server                 │
 │                          │◄────────►│                          │
 │  - Generate keys (BIP39) │          │  API Proxy (read-only)   │
 │  - Sign transactions     │          │  ├─ Balance              │
