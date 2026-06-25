@@ -147,7 +147,7 @@ MIT
 ## Links
 
 - **Website:** [nusacoin.org](https://nusacoin.org)
-- **Explorer:** [explorer.nusacoin.org](https://explorer.nusacoin.org)
+- **Explorer 1:** [explorer.nusacoin.org](https://explorer.nusacoin.org)
 - **Explorer 2:** [explorer.taobot.org](https://explorer.taobot.org)
 - **Explorer 3:** [book.taobot.org](https://book.taobot.org)
 - **Wallet:** [dompet.nusacoin.org](https://dompet.nusacoin.org)
