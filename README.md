@@ -153,4 +153,5 @@ MIT
 - **Wallet:** [dompet.nusacoin.org](https://dompet.nusacoin.org)
 - **Wallet 2:** [wallet.nusacoin.org](https://wallet.nusacoin.org)
 - **Wallet 3:** [paper.nusacoin.org](https://paper.nusacoin.org)
+- **Wallet Tool:** [dompet.taobot.org](https://dompet.taobot.org)
 - **GitHub:** [github.com/TaobotX11/walletweb-dark](https://github.com/TaobotX11/walletweb-dark)
