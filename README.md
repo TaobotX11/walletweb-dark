@@ -76,7 +76,7 @@ The backend is a lightweight API proxy that connects to a Nusacoin full node. It
 - express-rate-limit
 
 ### Deployment
-- Docker Compose
+- Docker Compose (optional)
 - Nginx reverse proxy with SSL (Let's Encrypt)
 
 ## Nusacoin Network Parameters
