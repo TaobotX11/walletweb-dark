@@ -116,6 +116,7 @@ function App() {
             onRefresh={wallet.refreshBalanceBech32}
             onSend={() => { wallet.setView('send'); wallet.setBech32(true); }}
             onReceive={() => wallet.setView('receive')}
+            onAddressBook={() => wallet.setView('addressbook')}
           />
         ) : null;
 

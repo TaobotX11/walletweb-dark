@@ -11,9 +11,10 @@ interface DashboardProps {
   onRefresh: () => void;
   onSend: () => void;
   onReceive: () => void;
+  onAddressBook: () => void;
 }
 
-export function Dashboard({ bech32address, balance, onInit, onRefresh, onSend, onReceive }: DashboardProps) {
+export function Dashboard({ bech32address, balance, onInit, onRefresh, onSend, onReceive, onAddressBook }: DashboardProps) {
   useEffect(() => {
     onInit();
     onRefresh();
@@ -53,6 +54,13 @@ export function Dashboard({ bech32address, balance, onInit, onRefresh, onSend, o
           </p>
         )}
       </div>
+
+      {/* Address Book: kept off the top navigation so the nav bar
+          stays within narrow phone screens without horizontal scroll,
+          and placed here, directly below the Balance card. */}
+      <button onClick={onAddressBook} className="btn-secondary w-full text-center py-4">
+        Address Book
+      </button>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-4">

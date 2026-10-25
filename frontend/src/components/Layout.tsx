@@ -60,7 +60,6 @@ export function Layout({
               { id: 'legacy', label: 'Legacy' },
               { id: 'receive', label: 'Receive' },
               { id: 'history', label: 'History' },
-              { id: 'addressbook', label: 'Address Book' },
             ].map((tab) => (
               <button
                 key={tab.id}
